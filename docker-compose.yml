@@ -1,0 +1,81 @@
+services:
+  postgres:
+    image: postgis/postgis:15-3.4
+    container_name: transit-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-transit}
+      POSTGRES_USER: ${POSTGRES_USER:-transit_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-transit_dev_password}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./000_init.sql:/docker-entrypoint-initdb.d/000_init.sql:ro
+      - ./001_schema.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
+      - ./003_seed.sql:/docker-entrypoint-initdb.d/002_seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-transit_app} -d ${POSTGRES_DB:-transit}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - transit-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: transit-redis
+    restart: unless-stopped
+    command: >
+      redis-server
+      --notify-keyspace-events Ex
+      --requirepass ${REDIS_PASSWORD:-transit_dev_password}
+      --appendonly yes
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a ${REDIS_PASSWORD:-transit_dev_password} ping | grep -q PONG"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - transit-net
+
+  pgadmin:
+    image: dpage/pgadmin4:8
+    container_name: transit-pgadmin
+    restart: unless-stopped
+    profiles: ["tools"]
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@transit.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8081:80"
+    depends_on:
+      - postgres
+    networks:
+      - transit-net
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: transit-redis-commander
+    restart: unless-stopped
+    profiles: ["tools"]
+    environment:
+      REDIS_HOSTS: local:redis:6379:0:${REDIS_PASSWORD:-transit_dev_password}
+    ports:
+      - "8082:8081"
+    depends_on:
+      - redis
+    networks:
+      - transit-net
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  transit-net:
+    driver: bridge
