@@ -1,3 +1,6 @@
 .env
 docker-example.yml
 documents/
+.agents
+skills-lock.json
+test_ignore.md
