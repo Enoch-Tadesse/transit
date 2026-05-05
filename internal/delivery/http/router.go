@@ -11,6 +11,9 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// NewRouter builds a gin engine with global middleware and registers
+// all route groups. returns an http.Handler for use with the standard
+// http.Server.
 func NewRouter(pg *postgres.Pool, rdb *redis.Client, logger zerolog.Logger) http.Handler {
 	r := gin.New()
 	r.Use(gin.Recovery())

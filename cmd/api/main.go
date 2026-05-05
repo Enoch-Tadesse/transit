@@ -17,6 +17,8 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// runMigrations applies any pending database schema changes on startup.
+// uses golang-migrate with file based migrations from the /migrations directory.
 func runMigrations(databaseURL string, logger zerolog.Logger) {
 	m, err := migrate.New("file://migrations", databaseURL)
 	if err != nil {
@@ -31,6 +33,9 @@ func runMigrations(databaseURL string, logger zerolog.Logger) {
 	logger.Info().Msg("migrations applied successfully")
 }
 
+// main is the application entry point. it loads config, runs migrations,
+// connects to postgres and redis, starts the http server, and blocks until
+// a SIGINT or SIGTERM signal triggers a graceful shutdown.
 func main() {
 	logger := zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr}).
 		With().

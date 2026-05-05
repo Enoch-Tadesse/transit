@@ -12,6 +12,8 @@ type Client struct {
 	*goredis.Client
 }
 
+// NewClient creates a go-redis client, pings the server to verify
+// connectivity, and returns a ready to use Client wrapper.
 func NewClient(ctx context.Context, addr, password string, logger zerolog.Logger) (*Client, error) {
 	client := goredis.NewClient(&goredis.Options{
 		Addr:     addr,

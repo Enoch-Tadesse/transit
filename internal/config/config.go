@@ -22,6 +22,9 @@ type Config struct {
 	Port                 string
 }
 
+// Load reads environment variables into a typed Config struct.
+// it panics at startup if JWT_SECRET, DATABASE_URL, or REDIS_URL
+// are empty since there is no safe fallback for these values.
 func Load() *Config {
 	// silently skip if no .env file present, picks up system env vars otherwise
 	_ = godotenv.Load()

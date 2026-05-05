@@ -36,6 +36,8 @@ func WriteJSON(c *gin.Context, status int, v any) {
 	c.JSON(status, v)
 }
 
+// WriteError sends a standardized error envelope matching the api contract.
+// optional field level details can be passed for validation errors.
 func WriteError(c *gin.Context, status int, code, message string, details ...ErrorDetail) {
 	body := ErrorEnvelope{
 		Error: ErrorBody{
@@ -49,6 +51,8 @@ func WriteError(c *gin.Context, status int, code, message string, details ...Err
 	c.JSON(status, body)
 }
 
+// WriteHealthz sends a health check response with per-service status.
+// if any dependency is down the overall status is set to degraded.
 func WriteHealthz(c *gin.Context, status int, services []HealthzStatus) {
 	overall := "ok"
 	if status != http.StatusOK {

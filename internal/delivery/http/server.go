@@ -13,6 +13,8 @@ type Server struct {
 	logger zerolog.Logger
 }
 
+// NewServer wraps an http.Server with sensible timeouts and a logger
+// for structured startup/shutdown messages.
 func NewServer(addr string, handler http.Handler, logger zerolog.Logger) *Server {
 	return &Server{
 		Server: &http.Server{

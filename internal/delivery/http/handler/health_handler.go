@@ -20,6 +20,9 @@ func NewHealthHandler(pg *postgres.Pool, rdb *redis.Client) *HealthHandler {
 	return &HealthHandler{pg: pg, rdb: rdb}
 }
 
+// Health checks postgres and redis connectivity and returns a 200 or 503
+// with per-service status so load balancers and orchestration tools know
+// whether the instance is ready to serve traffic.
 func (h *HealthHandler) Health(c *gin.Context) {
 	// dont let a stuck dependency hang the health endpoint forever
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 5*time.Second)

@@ -23,6 +23,9 @@ var domainToHTTP = map[error]HTTPStatus{
 	domain.ErrUnprocessable: {Status: http.StatusUnprocessableEntity, Code: "unprocessable"},
 }
 
+// MapError converts a domain sentinel error to an http status code,
+// error code string, and user facing message. unrecognized errors
+// fall through to a generic 500 internal_error.
 func MapError(err error) (int, string, string) {
 	if err == nil {
 		return http.StatusOK, "", ""

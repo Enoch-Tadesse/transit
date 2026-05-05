@@ -13,6 +13,8 @@ type Pool struct {
 	*pgxpool.Pool
 }
 
+// NewPool creates a pgxpool connection pool, verifies connectivity with a
+// ping, and returns a ready to use Pool wrapper.
 func NewPool(ctx context.Context, databaseURL string, logger zerolog.Logger) (*Pool, error) {
 	config, err := pgxpool.ParseConfig(databaseURL)
 	if err != nil {
