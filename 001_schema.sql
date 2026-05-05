@@ -12,6 +12,7 @@ BEGIN;
 -- ------------------------------------------------------------------
 CREATE EXTENSION IF NOT EXISTS postgis;
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
+CREATE EXTENSION IF NOT EXISTS citext;
 
 -- ------------------------------------------------------------------
 -- Enum types
@@ -47,10 +48,6 @@ CREATE TABLE users (
     CONSTRAINT users_email_or_phone_present
         CHECK (email IS NOT NULL OR phone_number IS NOT NULL)
 );
-
--- Enable citext here — users.email depends on it, and 000_init.sql may
--- or may not have run already depending on the init order.
-CREATE EXTENSION IF NOT EXISTS citext;
 
 CREATE UNIQUE INDEX uq_users_email
     ON users (email)
