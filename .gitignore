@@ -1,4 +1,3 @@
 .env
-./docker-example.yml
-./documents/
-./docker-example.yml
+docker-example.yml
+documents/
